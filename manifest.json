@@ -1,6 +1,6 @@
 {
-  "name": "ClassVision — AI Prompt Studio for Educators",
-  "short_name": "ClassVision",
+  "name": "TeachPrompt — AI Prompt Studio for Educators",
+  "short_name": "TeachPrompt",
   "description": "Compose precise, model-aware prompts for classroom-ready instructional graphics.",
   "start_url": "./index.html",
   "scope": "./",
