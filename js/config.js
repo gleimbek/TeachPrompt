@@ -7,7 +7,7 @@
  * automatically.
  */
 
-export const APP_VERSION = '1.3.1';
+export const APP_VERSION = '1.0.0';
 export const STORAGE_KEY = 'igpa-settings-v1';
 export const PRESETS_KEY = 'igpa-presets-v1';
 export const HISTORY_KEY = 'igpa-history-v1';
