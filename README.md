@@ -2,7 +2,7 @@
 
 **AI-powered prompt studio for educators · v1.3.1**
 
-TeachPrompt (formerly ClassVision / Lina's AI Teaching Toolkit) is a production-quality, modular web application that helps educators compose precise, model-aware prompts for generating classroom-ready instructional graphics (infographics, flowcharts, timelines, concept maps, diagrams, comparison charts, process illustrations, and more).
+TeachPrompt is a production-quality, modular web application that helps educators compose precise, model-aware prompts for generating classroom-ready instructional graphics (infographics, flowcharts, timelines, concept maps, diagrams, comparison charts, process illustrations, and more).
 
 ---
 
