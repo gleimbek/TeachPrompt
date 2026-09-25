@@ -18,6 +18,7 @@ import {
   DEFAULT_STATE
 } from './config.js';
 import { buildPrompt, getPromptStatus } from './prompt-builder.js';
+import { t, L, getLang, setLang } from './i18n.js';
 import {
   loadSettings,
   saveSettings,
@@ -61,36 +62,41 @@ function commit(partial = {}) {
 /** Render the entire application shell */
 export function renderApp() {
   applyTheme(state.theme || 'light');
+  document.documentElement.lang = getLang();
+  document.title = t('doc.title');
 
   const app = $('#app');
   if (!app) return;
 
   app.innerHTML = `
-    <a class="skip-link" href="#workspace">Skip to workspace</a>
+    <a class="skip-link" href="#workspace">${t('header.skip')}</a>
 
     <header class="site-header">
       <div class="header-inner">
         
 		<div class="brand">
           <div class="brand-row">
-            <img src="assets/logo.png" alt="logo">
+            <img src="assets/logo.png" alt="${t('header.logoAlt')}">
           
-			<p class="tagline">Design professional prompts customized for each AI tool to transform educational ideas into engaging learning materials: infographics, diagrams, concept maps, timelines, and personalized teaching resources for every academic level.
-			</p>
+			<p class="tagline">${t('header.tagline')}</p>
 		  </div>
 		</div>
 		
         <div class="header-actions">
-          <button type="button" class="btn btn-ghost btn-icon" id="btn-history" aria-label="View prompt history" title="Prompt history">
+          <button type="button" class="btn btn-ghost btn-icon" id="btn-history" aria-label="${t('header.historyAria')}" title="${t('header.history')}">
             <span class="history-icon" aria-hidden="true"></span>
           </button>
 		  
-          <button type="button" class="btn btn-ghost btn-icon" id="btn-theme" aria-label="Toggle dark mode" title="Toggle dark / light mode">
+          <button type="button" class="btn btn-ghost btn-icon btn-lang" id="btn-lang" aria-label="${t('header.langAria')}" title="${t('header.lang')}">
+            <span aria-hidden="true">${t('header.langButton')}</span>
+          </button>
+
+          <button type="button" class="btn btn-ghost btn-icon" id="btn-theme" aria-label="${t('header.themeAria')}" title="${t('header.theme')}">
             <span class="theme-icon" aria-hidden="true"></span>
           </button>
 		  
           <span class="version-badge">v${APP_VERSION}</span>
-          <span class="for-educators">K–12 · Higher Ed</span>
+          <span class="for-educators">${t('header.levels')}</span>
         </div>
       </div>
     </header>
@@ -100,28 +106,28 @@ export function renderApp() {
         <!-- Sections injected by renderWorkspace -->
       </div>
 
-      <aside class="preview-panel" aria-label="Generated prompt preview">
+      <aside class="preview-panel" aria-label="${t('preview.aria')}">
         <div class="preview-header">
-          <h2>The Generated Prompt</h2>
+          <h2>${t('preview.title')}</h2>
           <span class="model-tag" id="preview-model-tag"></span>
         </div>
         <div class="preview-body">
-          <pre id="prompt-output" class="prompt-output" tabindex="0" role="region" aria-live="polite" aria-label="Live prompt text"></pre>
+          <pre id="prompt-output" class="prompt-output" tabindex="0" role="region" aria-live="polite" aria-label="${t('preview.outputAria')}"></pre>
           <p class="preview-placeholder" id="preview-placeholder"></p>
         </div>
         <div class="preview-actions">
-		  <button type="button" class="btn btn-primary" id="btn-execute">Run Prompt</button>
-          <button type="button" class="btn btn-secondary" id="btn-copy">Copy</button>
-          <button type="button" class="btn btn-secondary" id="btn-download">Download .txt</button>
-          <button type="button" class="btn btn-secondary" id="btn-reset">Reset</button>
+		  <button type="button" class="btn btn-primary" id="btn-execute">${t('preview.execute')}</button>
+          <button type="button" class="btn btn-secondary" id="btn-copy">${t('preview.copy')}</button>
+          <button type="button" class="btn btn-secondary" id="btn-download">${t('preview.download')}</button>
+          <button type="button" class="btn btn-secondary" id="btn-reset">${t('preview.reset')}</button>
         </div>
         <div class="preview-status" id="preview-status" aria-live="polite"></div>
       </aside>
     </main>
 
     <footer class="site-footer">
-      <p>Professional AI prompt creation for educators. Every selection updates your prompt instantly.</p>
-      <p class="footer-meta">Smart Prompts · Better Teaching · Better Learning</p>
+      <p>${t('footer.line1')}</p>
+      <p class="footer-meta">${t('footer.line2')}</p>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
@@ -129,12 +135,12 @@ export function renderApp() {
     <div class="modal" id="preset-modal" hidden>
       <div class="modal-backdrop" data-close-modal></div>
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="preset-modal-title">
-        <h2 id="preset-modal-title">Save Preset</h2>
-        <label class="field-label" for="preset-name">Preset name</label>
-        <input type="text" id="preset-name" class="field-input" placeholder="e.g. Biology Concept Maps – High School" maxlength="80" />
+        <h2 id="preset-modal-title">${t('presetModal.title')}</h2>
+        <label class="field-label" for="preset-name">${t('presetModal.label')}</label>
+        <input type="text" id="preset-name" class="field-input" placeholder="${t('presetModal.placeholder')}" maxlength="80" />
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
-          <button type="button" class="btn btn-primary" id="btn-confirm-save-preset">Save</button>
+          <button type="button" class="btn btn-secondary" data-close-modal>${t('presetModal.cancel')}</button>
+          <button type="button" class="btn btn-primary" id="btn-confirm-save-preset">${t('presetModal.save')}</button>
         </div>
       </div>
     </div>
@@ -143,13 +149,13 @@ export function renderApp() {
       <div class="modal-backdrop" data-close-modal></div>
       <div class="modal-dialog modal-dialog-wide" role="dialog" aria-modal="true" aria-labelledby="history-modal-title">
         <div class="modal-header-row">
-          <h2 id="history-modal-title">Prompt History</h2>
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-history">Clear all</button>
+          <h2 id="history-modal-title">${t('history.title')}</h2>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-history">${t('history.clear')}</button>
         </div>
-        <p class="modal-subtitle">Prompts you've copied or downloaded, newest first. Nothing is recorded until you use Copy or Download.</p>
+        <p class="modal-subtitle">${t('history.subtitle')}</p>
         <div class="history-list" id="history-list"></div>
         <div class="modal-actions">
-          <button type="button" class="btn btn-secondary" data-close-modal>Close</button>
+          <button type="button" class="btn btn-secondary" data-close-modal>${t('history.close')}</button>
         </div>
       </div>
     </div>
@@ -191,13 +197,13 @@ function renderWorkspace() {
 
 function renderQuickStart() {
   const buttons = QUICK_STARTS.map(qs =>
-    `<button type="button" class="chip chip-quick" data-quick="${qs.id}">${qs.label}</button>`
+    `<button type="button" class="chip chip-quick" data-quick="${qs.id}">${L(qs.label)}</button>`
   ).join('');
 
   return `
-    <section class="section quick-start" aria-label="Quick start templates">
+    <section class="section quick-start" aria-label="${t('quick.aria')}">
       <div class="quick-start-row">
-        <span class="quick-label">Quick start →</span>
+        <span class="quick-label">${t('quick.label')}</span>
         ${buttons}
       </div>
     </section>
@@ -206,55 +212,55 @@ function renderQuickStart() {
 
 function renderSectionContent() {
   const subjectOpts = OPTIONS.subjectArea.map(o =>
-    `<option value="${o.value}" ${state.subjectArea === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.subjectArea === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const gradeOpts = OPTIONS.gradeLevel.map(o =>
-    `<option value="${o.value}" ${state.gradeLevel === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.gradeLevel === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const bloomOpts = OPTIONS.bloomLevel.map(o =>
-    `<option value="${o.value}" ${state.bloomLevel === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.bloomLevel === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
 
   return `
     <section class="section" id="section-content" aria-labelledby="heading-content">
       <div class="section-header">
-        <h2 id="heading-content"><span class="section-num">§ 01</span> Learning Content</h2>
-        <p class="section-desc">The concepts, topics, and skills taught in this lesson.</p>
+        <h2 id="heading-content"><span class="section-num">§ 01</span> ${t('s1.title')}</h2>
+        <p class="section-desc">${t('s1.desc')}</p>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="topic">Topic or Lesson Title <span class="req" aria-hidden="true">*</span></label>
+        <label class="field-label" for="topic">${t('s1.topic')} <span class="req" aria-hidden="true">*</span></label>
         <input type="text" id="topic" class="field-input"
-               placeholder="e.g., SQL Joins, OSI Model Layers, Mitochondrial Respiration"
+               placeholder="${t('s1.topicPh')}"
                value="${escapeAttr(state.topic)}" autocomplete="off" />
       </div>
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="subjectArea">Subject Area</label>
+          <label class="field-label" for="subjectArea">${t('s1.subject')}</label>
           <select id="subjectArea" class="field-select">${subjectOpts}</select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="gradeLevel">Grade / Skill Level</label>
+          <label class="field-label" for="gradeLevel">${t('s1.grade')}</label>
           <select id="gradeLevel" class="field-select">${gradeOpts}</select>
         </div>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="audience">Audience</label>
+        <label class="field-label" for="audience">${t('s1.audience')}</label>
         <input type="text" id="audience" class="field-input"
-               placeholder="e.g., 10th-grade biology students, adult professional learners"
+               placeholder="${t('s1.audiencePh')}"
                value="${escapeAttr(state.audience)}" />
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="learningObjective">Learning Objective</label>
+        <label class="field-label" for="learningObjective">${t('s1.objective')}</label>
         <textarea id="learningObjective" class="field-textarea" rows="2"
-                  placeholder="By the end of viewing this graphic, the learner will be able to…">${escapeHtml(state.learningObjective)}</textarea>
+                  placeholder="${t('s1.objectivePh')}">${escapeHtml(state.learningObjective)}</textarea>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="bloomLevel">Bloom's Taxonomy Level</label>
+        <label class="field-label" for="bloomLevel">${t('s1.bloom')}</label>
         <select id="bloomLevel" class="field-select">${bloomOpts}</select>
       </div>
     </section>
@@ -266,10 +272,10 @@ function renderSectionGraphicType() {
     const selected = state.graphicType === g.id ? 'is-selected' : '';
     return `
       <button type="button" class="graphic-card ${selected}" data-graphic="${g.id}"
-              aria-pressed="${state.graphicType === g.id}" title="${escapeAttr(g.description)}">
-        <span class="graphic-title">${g.title}</span>
-        <span class="graphic-subtitle">${g.subtitle}</span>
-        <span class="graphic-desc">${g.description}</span>
+              aria-pressed="${state.graphicType === g.id}" title="${escapeAttr(L(g.description))}">
+        <span class="graphic-title">${L(g.title)}</span>
+        <span class="graphic-subtitle">${L(g.subtitle)}</span>
+        <span class="graphic-desc">${L(g.description)}</span>
       </button>
     `;
   }).join('');
@@ -277,10 +283,10 @@ function renderSectionGraphicType() {
   return `
     <section class="section" id="section-graphic-type" aria-labelledby="heading-graphic">
       <div class="section-header">
-        <h2 id="heading-graphic"><span class="section-num">§ 02</span>Visual Format</h2>
-        <p class="section-desc">How the information is presented</p>
+        <h2 id="heading-graphic"><span class="section-num">§ 02</span>${t('s2.title')}</h2>
+        <p class="section-desc">${t('s2.desc')}</p>
       </div>
-      <div class="graphic-grid" role="group" aria-label="Select graphic type">
+      <div class="graphic-grid" role="group" aria-label="${t('s2.aria')}">
         ${cards}
       </div>
     </section>
@@ -289,54 +295,54 @@ function renderSectionGraphicType() {
 
 function renderSectionVisuals() {
   const styleOpts = OPTIONS.visualStyle.map(o =>
-    `<option value="${o.value}" ${state.visualStyle === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.visualStyle === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const toneOpts = OPTIONS.tone.map(o =>
-    `<option value="${o.value}" ${state.tone === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.tone === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const colorOpts = OPTIONS.colorScheme.map(o =>
-    `<option value="${o.value}" ${state.colorScheme === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.colorScheme === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const complexOpts = OPTIONS.complexity.map(o =>
-    `<option value="${o.value}" ${state.complexity === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.complexity === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
 
   const iconChips = ICON_PREFERENCES.map(p => {
     const active = (state.iconPreferences || []).includes(p.id) ? 'is-active' : '';
-    return `<button type="button" class="chip chip-toggle ${active}" data-icon="${p.id}" aria-pressed="${active ? 'true' : 'false'}">${p.label}</button>`;
+    return `<button type="button" class="chip chip-toggle ${active}" data-icon="${p.id}" aria-pressed="${active ? 'true' : 'false'}">${L(p.label)}</button>`;
   }).join('');
 
   return `
     <section class="section" id="section-visuals" aria-labelledby="heading-visuals">
       <div class="section-header">
-        <h2 id="heading-visuals"><span class="section-num">§ 03</span>Look &amp; Feel</h2>
-        <p class="section-desc">The overall aesthetic and visual tone</p>
+        <h2 id="heading-visuals"><span class="section-num">§ 03</span>${t('s3.title')}</h2>
+        <p class="section-desc">${t('s3.desc')}</p>
       </div>
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="visualStyle">Visual Style</label>
+          <label class="field-label" for="visualStyle">${t('s3.style')}</label>
           <select id="visualStyle" class="field-select">${styleOpts}</select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="tone">Tone</label>
+          <label class="field-label" for="tone">${t('s3.tone')}</label>
           <select id="tone" class="field-select">${toneOpts}</select>
         </div>
       </div>
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="colorScheme">Color Palette</label>
+          <label class="field-label" for="colorScheme">${t('s3.color')}</label>
           <select id="colorScheme" class="field-select">${colorOpts}</select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="complexity">Complexity / Density</label>
+          <label class="field-label" for="complexity">${t('s3.complexity')}</label>
           <select id="complexity" class="field-select">${complexOpts}</select>
         </div>
       </div>
 
       <div class="field-group">
-        <span class="field-label" id="icon-pref-label">Icon &amp; Illustration Preference</span>
+        <span class="field-label" id="icon-pref-label">${t('s3.icons')}</span>
         <div class="chip-row chip-label" role="group" aria-labelledby="icon-pref-label">
           ${iconChips}
         </div>
@@ -347,34 +353,34 @@ function renderSectionVisuals() {
 
 function renderSectionLayout() {
   const sizeOpts = OPTIONS.sizePreset.map(o =>
-    `<option value="${o.value}" ${state.sizePreset === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.sizePreset === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const orientOpts = OPTIONS.orientation.map(o =>
-    `<option value="${o.value}" ${state.orientation === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.orientation === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const textOpts = OPTIONS.amountOfText.map(o =>
-    `<option value="${o.value}" ${state.amountOfText === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.amountOfText === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
 
   return `
     <section class="section" id="section-layout" aria-labelledby="heading-layout">
       <div class="section-header">
-        <h2 id="heading-layout"><span class="section-num">§ 04</span>Layout &amp; Dimensions</h2>
-        <p class="section-desc">The physical arrangement and size of visual elements</p>
+        <h2 id="heading-layout"><span class="section-num">§ 04</span>${t('s4.title')}</h2>
+        <p class="section-desc">${t('s4.desc')}</p>
       </div>
 
       <div class="field-group">
-        <label class="field-label" for="sizePreset">Size Preset</label>
+        <label class="field-label" for="sizePreset">${t('s4.size')}</label>
         <select id="sizePreset" class="field-select">${sizeOpts}</select>
       </div>
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="orientation">Orientation</label>
+          <label class="field-label" for="orientation">${t('s4.orientation')}</label>
           <select id="orientation" class="field-select">${orientOpts}</select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="amountOfText">Amount of Text</label>
+          <label class="field-label" for="amountOfText">${t('s4.text')}</label>
           <select id="amountOfText" class="field-select">${textOpts}</select>
         </div>
       </div>
@@ -384,26 +390,26 @@ function renderSectionLayout() {
 
 function renderSectionOutput() {
   const formatOpts = OPTIONS.fileFormat.map(o =>
-    `<option value="${o.value}" ${state.fileFormat === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.fileFormat === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
   const resOpts = OPTIONS.resolution.map(o =>
-    `<option value="${o.value}" ${state.resolution === o.value ? 'selected' : ''}>${o.label}</option>`
+    `<option value="${o.value}" ${state.resolution === o.value ? 'selected' : ''}>${L(o.label)}</option>`
   ).join('');
 
   return `
     <section class="section" id="section-output" aria-labelledby="heading-output">
       <div class="section-header">
-        <h2 id="heading-output"><span class="section-num">§ 05</span>Delivery Format</h2>
-        <p class="section-desc">The technical format of the final deliverable</p>
+        <h2 id="heading-output"><span class="section-num">§ 05</span>${t('s5.title')}</h2>
+        <p class="section-desc">${t('s5.desc')}</p>
       </div>
 
       <div class="field-row">
         <div class="field-group">
-          <label class="field-label" for="fileFormat">File Format</label>
+          <label class="field-label" for="fileFormat">${t('s5.format')}</label>
           <select id="fileFormat" class="field-select">${formatOpts}</select>
         </div>
         <div class="field-group">
-          <label class="field-label" for="resolution">Resolution</label>
+          <label class="field-label" for="resolution">${t('s5.resolution')}</label>
           <select id="resolution" class="field-select">${resOpts}</select>
         </div>
       </div>
@@ -411,11 +417,11 @@ function renderSectionOutput() {
       <div class="checkbox-row">
         <label class="checkbox-label">
           <input type="checkbox" id="transparentBg" ${state.transparentBg ? 'checked' : ''} />
-          <span>Transparent background</span>
+          <span>${t('s5.transparent')}</span>
         </label>
         <label class="checkbox-label">
           <input type="checkbox" id="safeMargins" ${state.safeMargins ? 'checked' : ''} />
-          <span>Include safe margins / bleed area</span>
+          <span>${t('s5.margins')}</span>
         </label>
       </div>
     </section>
@@ -428,7 +434,7 @@ function renderSectionAccessibility() {
     return `
       <label class="checkbox-label">
         <input type="checkbox" data-a11y="${p.id}" ${checked} />
-        <span>${p.label}</span>
+        <span>${L(p.label)}</span>
       </label>
     `;
   }).join('');
@@ -436,8 +442,8 @@ function renderSectionAccessibility() {
   return `
     <section class="section" id="section-accessibility" aria-labelledby="heading-a11y">
       <div class="section-header">
-        <h2 id="heading-a11y"><span class="section-num">§ 06</span>Accessibility Features</h2>
-        <p class="section-desc">Design choices that support diverse learners</p>
+        <h2 id="heading-a11y"><span class="section-num">§ 06</span>${t('s6.title')}</h2>
+        <p class="section-desc">${t('s6.desc')}</p>
       </div>
       <div class="checkbox-grid">
         ${checks}
@@ -452,7 +458,7 @@ function renderSectionPedagogical() {
     return `
       <label class="checkbox-label">
         <input type="checkbox" data-pedagogical="${p.id}" ${checked} />
-        <span>${p.label}</span>
+        <span>${L(p.label)}</span>
       </label>
     `;
   }).join('');
@@ -460,8 +466,8 @@ function renderSectionPedagogical() {
   return `
     <section class="section" id="section-pedagogical" aria-labelledby="heading-pedagogical">
       <div class="section-header">
-        <h2 id="heading-pedagogical"><span class="section-num">§ 07</span>Instructional Guidelines</h2>
-        <p class="section-desc">Standards and rules for effective learning design</p>
+        <h2 id="heading-pedagogical"><span class="section-num">§ 07</span>${t('s7.title')}</h2>
+        <p class="section-desc">${t('s7.desc')}</p>
       </div>
       <div class="checkbox-grid">
         ${checks}
@@ -475,8 +481,8 @@ function renderSectionModel() {
     const active = state.model === m.id ? 'is-active' : '';
     return `
       <button type="button" class="model-card ${active}" data-model="${m.id}" aria-pressed="${state.model === m.id}">
-        <span class="model-name">${m.name}</span>
-        <span class="model-tagline">${m.tagline}</span>
+        <span class="model-name">${L(m.name)}</span>
+        <span class="model-tagline">${L(m.tagline)}</span>
       </button>
     `;
   }).join('');
@@ -484,10 +490,10 @@ function renderSectionModel() {
   return `
     <section class="section" id="section-model" aria-labelledby="heading-model">
       <div class="section-header">
-        <h2 id="heading-model"><span class="section-num">§ 08</span>AI Model</h2>
-        <p class="section-desc">The model used to generate the output</p>
+        <h2 id="heading-model"><span class="section-num">§ 08</span>${t('s8.title')}</h2>
+        <p class="section-desc">${t('s8.desc')}</p>
       </div>
-      <div class="model-grid" role="group" aria-label="Select target AI model">
+      <div class="model-grid" role="group" aria-label="${t('s8.aria')}">
         ${modelButtons}
       </div>
     </section>
@@ -498,13 +504,13 @@ function renderSectionNotes() {
   return `
     <section class="section" id="section-notes" aria-labelledby="heading-notes">
       <div class="section-header">
-        <h2 id="heading-notes"><span class="section-num">§ 09</span>Additional Notes</h2>
-        <p class="section-desc">Optional details or preferences</p>
+        <h2 id="heading-notes"><span class="section-num">§ 09</span>${t('s9.title')}</h2>
+        <p class="section-desc">${t('s9.desc')}</p>
       </div>
       <div class="field-group">
-        <label class="field-label" for="extraNotes">Extra instructions or constraints</label>
+        <label class="field-label" for="extraNotes">${t('s9.label')}</label>
         <textarea id="extraNotes" class="field-textarea" rows="3"
-                  placeholder="Any specific content points, must-include examples, brand colors, or other constraints…">${escapeHtml(state.extraNotes || '')}</textarea>
+                  placeholder="${t('s9.ph')}">${escapeHtml(state.extraNotes || '')}</textarea>
       </div>
     </section>
   `;
@@ -517,20 +523,20 @@ function renderPresetBar() {
   ).join('');
 
   return `
-    <section class="section preset-bar" aria-label="Presets">
+    <section class="section preset-bar" aria-label="${t('presets.aria')}">
       <div class="preset-controls">
-        <button type="button" class="btn btn-secondary" id="btn-save-preset">Save Preset</button>
+        <button type="button" class="btn btn-secondary" id="btn-save-preset">${t('presets.save')}</button>
         <div class="preset-load-group">
-          <label class="visually-hidden" for="preset-select">Load preset</label>
+          <label class="visually-hidden" for="preset-select">${t('presets.loadLabel')}</label>
           <select id="preset-select" class="field-select">
-            <option value="">— Load preset —</option>
+            <option value="">${t('presets.loadOption')}</option>
             ${options}
           </select>
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-delete-preset" title="Delete selected preset" ${presets.length ? '' : 'disabled'}>Delete</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-delete-preset" title="${t('presets.deleteTitle')}" ${presets.length ? '' : 'disabled'}>${t('presets.delete')}</button>
         </div>
         <div class="preset-io-group">
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-export-presets" title="Download all presets as a JSON file" ${presets.length ? '' : 'disabled'}>Export</button>
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-import-presets" title="Import presets from a JSON file">Import</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-export-presets" title="${t('presets.exportTitle')}" ${presets.length ? '' : 'disabled'}>${t('presets.export')}</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-import-presets" title="${t('presets.importTitle')}">${t('presets.import')}</button>
         </div>
       </div>
     </section>
@@ -564,13 +570,20 @@ function bindGlobalEvents() {
 
     if (copied) {
       addToHistory(text, state);
-      showToast(`Prompt copiado. Abriendo ${activeModel.name}...`);
+      showToast(t('toast.executeOk', { name: L(activeModel.name) }));
     } else {
-      showToast(`No se pudo copiar automáticamente, pero abriendo ${activeModel.name}...`);
+      showToast(t('toast.executeFail', { name: L(activeModel.name) }));
     }
 
     // 2. Abrir la URL inmediatamente después de la copia
     window.open(targetUrl, '_blank', 'noopener,noreferrer');
+  });
+
+  // Cambiar idioma: vuelve a dibujar toda la app con el mismo estado
+  $('#btn-lang')?.addEventListener('click', () => {
+    setLang(getLang() === 'es' ? 'en' : 'es');
+    renderApp();
+    $('#btn-lang')?.focus();
   });
 
   // Alternar tema claro/oscuro
@@ -585,32 +598,33 @@ function bindGlobalEvents() {
     const text = buildPrompt(state);
     const ok = await copyToClipboard(text);
     if (ok) addToHistory(text, state);
-    showToast(ok ? 'Copied to clipboard' : 'Copy failed — select and copy manually');
+    showToast(ok ? t('toast.copied') : t('toast.copyFailed'));
   });
 
   // Descargar archivo .txt
   $('#btn-download')?.addEventListener('click', () => {
     const text = buildPrompt(state);
-    const safeName = (state.topic || 'instructional-graphic-prompt')
+    const safeName = (state.topic || t('file.defaultName'))
       .slice(0, 40)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^\w\s-]/g, '')
       .trim()
       .replace(/\s+/g, '-')
       .toLowerCase() || 'prompt';
     downloadText(`${safeName}.txt`, text);
     addToHistory(text, state);
-    showToast('Download started');
+    showToast(t('toast.download'));
   });
 
   // Resetear campos
   $('#btn-reset')?.addEventListener('click', () => {
-    if (!confirm('Reset all fields to defaults? This cannot be undone.')) return;
+    if (!confirm(t('confirm.reset'))) return;
     state = { ...DEFAULT_STATE, theme: state.theme };
     saveSettings(state);
     renderWorkspace();
     updatePromptPreview();
     updateStatus();
-    showToast('Reset to defaults');
+    showToast(t('toast.reset'));
   });
 
   // Ver historial
@@ -624,9 +638,9 @@ function bindGlobalEvents() {
     try {
       const { added } = await importPresetsFromFile(file);
       renderWorkspace();
-      showToast(`Imported ${added} preset${added === 1 ? '' : 's'}`);
+      showToast(t('toast.imported', { count: added }));
     } catch (err) {
-      showToast(err.message || 'Import failed');
+      showToast(err.message || t('toast.importFailed'));
     }
   });
 
@@ -641,26 +655,29 @@ function bindGlobalEvents() {
   // Limpiar historial
   $('#btn-clear-history')?.addEventListener('click', () => {
     if (!loadHistory().length) return;
-    if (!confirm('Clear your entire prompt history? This cannot be undone.')) return;
+    if (!confirm(t('confirm.clearHistory'))) return;
     clearHistory();
     renderHistoryList();
-    showToast('History cleared');
+    showToast(t('toast.historyCleared'));
   });
 
   // Guardar preset
   $('#btn-confirm-save-preset')?.addEventListener('click', () => {
     const name = ($('#preset-name')?.value || '').trim();
     if (!name) {
-      showToast('Please enter a preset name');
+      showToast(t('toast.presetNameMissing'));
       return;
     }
     upsertPreset(name, state);
     closePresetModal();
     renderWorkspace();
-    showToast(`Preset “${name}” saved`);
+    showToast(t('toast.presetSaved', { name }));
   });
 
-  // Cerrar modales con la tecla Escape
+  // Cerrar modales con la tecla Escape.
+  // Se registra una sola vez: renderApp() se vuelve a ejecutar al cambiar de idioma.
+  if (bindGlobalEvents.escapeBound) return;
+  bindGlobalEvents.escapeBound = true;
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       const presetModal = $('#preset-modal');
@@ -677,9 +694,9 @@ function bindSectionEvents() {
     btn.addEventListener('click', () => {
       const qs = QUICK_STARTS.find(q => q.id === btn.dataset.quick);
       if (!qs) return;
-      commit({ ...qs.values });
+      commit({ ...qs.values, audience: L(qs.values.audience) });
       renderWorkspace();
-      showToast(`Applied “${qs.label}” template`);
+      showToast(t('toast.templateApplied', { name: L(qs.label) }));
     });
   });
 
@@ -789,32 +806,32 @@ function bindSectionEvents() {
     renderWorkspace();
     updatePromptPreview();
     updateStatus();
-    showToast(`Loaded “${preset.name}”`);
+    showToast(t('toast.presetLoaded', { name: preset.name }));
   });
 
   $('#btn-delete-preset')?.addEventListener('click', () => {
     const select = $('#preset-select');
     const id = select?.value;
     if (!id) {
-      showToast('Select a preset to delete');
+      showToast(t('toast.selectPreset'));
       return;
     }
     const presets = loadPresets();
     const preset = presets.find(p => p.id === id);
     if (!preset) return;
-    if (!confirm(`Delete preset “${preset.name}”?`)) return;
+    if (!confirm(t('confirm.deletePreset', { name: preset.name }))) return;
     deletePreset(id);
     renderWorkspace();
-    showToast('Preset deleted');
+    showToast(t('toast.presetDeleted'));
   });
 
   $('#btn-export-presets')?.addEventListener('click', () => {
     if (!loadPresets().length) {
-      showToast('No presets to export yet');
+      showToast(t('toast.noPresets'));
       return;
     }
     exportPresets();
-    showToast('Presets exported');
+    showToast(t('toast.presetsExported'));
   });
 
   $('#btn-import-presets')?.addEventListener('click', () => {
@@ -837,7 +854,7 @@ function updatePromptPreview() {
   const status = getPromptStatus(state);
   if (placeholder) {
     if (status.level === 'empty') {
-      placeholder.textContent = status.label + '. Your prompt will compose itself here.';
+      placeholder.textContent = status.label + t('preview.placeholderSuffix');
       placeholder.hidden = false;
       output.classList.add('is-empty');
     } else {
@@ -853,7 +870,7 @@ function updateModelTag() {
   const tag = $('#preview-model-tag');
   if (!tag) return;
   const model = MODELS.find(m => m.id === state.model);
-  tag.textContent = model ? `For ${model.name}` : '';
+  tag.textContent = model ? t('preview.forModel', { name: L(model.name) }) : '';
 }
 
 function updateStatus() {
@@ -874,7 +891,7 @@ function openPresetModal() {
   if (!modal) return;
   modal.hidden = false;
   if (input) {
-    input.value = state.topic ? `${state.topic.slice(0, 40)} preset` : '';
+    input.value = state.topic ? t('presetModal.defaultName', { topic: state.topic.slice(0, 40) }) : '';
     setTimeout(() => input.focus(), 50);
   }
 }
@@ -902,7 +919,7 @@ function renderHistoryList() {
   const history = loadHistory();
 
   if (!history.length) {
-    list.innerHTML = `<p class="history-empty">No prompts recorded yet. Copy or download a prompt to start building your history.</p>`;
+    list.innerHTML = `<p class="history-empty">${t('history.empty')}</p>`;
     return;
   }
 
@@ -910,7 +927,7 @@ function renderHistoryList() {
     const graphic = GRAPHIC_TYPES.find(g => g.id === entry.graphicType);
     const model = MODELS.find(m => m.id === entry.model);
     const date = new Date(entry.created);
-    const dateLabel = isNaN(date) ? '' : date.toLocaleString(undefined, {
+    const dateLabel = isNaN(date) ? '' : date.toLocaleString(getLang(), {
       month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
     });
     return `
@@ -918,15 +935,15 @@ function renderHistoryList() {
         <div class="history-item-main">
           <p class="history-item-topic">${escapeHtml(entry.topic)}</p>
           <div class="history-item-meta">
-            ${graphic ? `<span class="history-chip">${escapeHtml(graphic.title)}</span>` : ''}
-            ${model ? `<span class="history-chip">${escapeHtml(model.name)}</span>` : ''}
+            ${graphic ? `<span class="history-chip">${escapeHtml(L(graphic.title))}</span>` : ''}
+            ${model ? `<span class="history-chip">${escapeHtml(L(model.name))}</span>` : ''}
             ${dateLabel ? `<span class="history-date">${dateLabel}</span>` : ''}
           </div>
         </div>
         <div class="history-item-actions">
-          <button type="button" class="btn btn-ghost btn-sm" data-restore-history="${entry.id}">Restore</button>
-          <button type="button" class="btn btn-ghost btn-sm" data-copy-history="${entry.id}">Copy</button>
-          <button type="button" class="btn btn-ghost btn-sm" data-delete-history="${entry.id}">Delete</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-restore-history="${entry.id}">${t('history.restore')}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-copy-history="${entry.id}">${t('history.copy')}</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-delete-history="${entry.id}">${t('history.delete')}</button>
         </div>
       </div>
     `;
@@ -942,7 +959,7 @@ function renderHistoryList() {
       updatePromptPreview();
       updateStatus();
       closeHistoryModal();
-      showToast('Prompt settings restored');
+      showToast(t('toast.restored'));
     });
   });
 
@@ -951,7 +968,7 @@ function renderHistoryList() {
       const entry = loadHistory().find(h => h.id === btn.dataset.copyHistory);
       if (!entry) return;
       const ok = await copyToClipboard(entry.promptText);
-      showToast(ok ? 'Copied to clipboard' : 'Copy failed — select and copy manually');
+      showToast(ok ? t('toast.copied') : t('toast.copyFailed'));
     });
   });
 

@@ -6,7 +6,7 @@
  * update instead of serving a stale cached copy.
  */
 
-const CACHE_NAME = 'teachprompt-v1.0.0';
+const CACHE_NAME = 'teachprompt-v1.4.0';
 
 const APP_SHELL = [
   './',
@@ -15,16 +15,15 @@ const APP_SHELL = [
   './css/styles.css',
   './js/app.js',
   './js/config.js',
+  './js/i18n.js',
   './js/prompt-builder.js',
   './js/storage.js',
   './js/ui.js',
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
-  './assets/icons/icon-maskable-512.png',
   './assets/icons/apple-touch-icon.png',
   './assets/icons/favicon-32.png',
-  './assets/logo-mark.svg',
-  './assets/logo-full.svg'
+  './assets/logo.png'
 ];
 
 self.addEventListener('install', (event) => {

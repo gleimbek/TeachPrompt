@@ -313,6 +313,14 @@ a {
   content: "◑";
 }
 
+/* Language toggle (EN / ES) */
+.btn-lang {
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 .history-icon::before {
   content: "↺";
   font-size: 1.1rem;

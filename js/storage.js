@@ -4,6 +4,7 @@
  */
 
 import { STORAGE_KEY, PRESETS_KEY, HISTORY_KEY, HISTORY_LIMIT, DEFAULT_STATE } from './config.js';
+import { t } from './i18n.js';
 
 /**
  * Load the last-used settings from localStorage.
@@ -113,13 +114,13 @@ export function deletePreset(id) {
 export function exportPresets() {
   const presets = loadPresets();
   const payload = {
-    app: "ClassVision",
+    app: "TeachPrompt",
     exportedAt: new Date().toISOString(),
     schema: 1,
     presets
   };
   const stamp = new Date().toISOString().slice(0, 10);
-  downloadText(`teaching-toolkit-presets-${stamp}.json`, JSON.stringify(payload, null, 2));
+  downloadText(`teachprompt-presets-${stamp}.json`, JSON.stringify(payload, null, 2));
 }
 
 /**
@@ -131,24 +132,24 @@ export function exportPresets() {
  */
 export function importPresetsFromFile(file) {
   return new Promise((resolve, reject) => {
-    if (!file) { reject(new Error('No file selected.')); return; }
+    if (!file) { reject(new Error(t('import.noFile'))); return; }
     const reader = new FileReader();
     reader.onload = () => {
       let parsed;
       try {
         parsed = JSON.parse(reader.result);
       } catch (e) {
-        reject(new Error('That file is not valid JSON.'));
+        reject(new Error(t('import.invalidJson')));
         return;
       }
       const incoming = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.presets) ? parsed.presets : null);
       if (!incoming) {
-        reject(new Error('No presets array found in this file.'));
+        reject(new Error(t('import.noArray')));
         return;
       }
       const valid = incoming.filter(p => p && typeof p.name === 'string' && p.state && typeof p.state === 'object');
       if (!valid.length) {
-        reject(new Error('This file does not contain any recognizable presets.'));
+        reject(new Error(t('import.noValid')));
         return;
       }
 
@@ -164,7 +165,7 @@ export function importPresetsFromFile(file) {
           id = `preset-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         }
         let name = p.name;
-        if (existingNames.has(name)) name = `${name} (imported)`;
+        if (existingNames.has(name)) name = `${name} ${t('import.suffix')}`;
         existing.push({
           id,
           name,
@@ -180,7 +181,7 @@ export function importPresetsFromFile(file) {
       savePresets(existing);
       resolve({ added });
     };
-    reader.onerror = () => reject(new Error('Could not read that file.'));
+    reader.onerror = () => reject(new Error(t('import.readError')));
     reader.readAsText(file);
   });
 }
@@ -223,7 +224,7 @@ export function addToHistory(promptText, state) {
   const entry = {
     id: `hist-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     created: new Date().toISOString(),
-    topic: (state.topic || '').trim() || '(untitled)',
+    topic: (state.topic || '').trim() || t('history.untitled'),
     graphicType: state.graphicType,
     model: state.model,
     promptText,

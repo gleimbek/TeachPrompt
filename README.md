@@ -1,6 +1,6 @@
 # TeachPrompt — AI Studio for Educators
 
-**AI-powered prompt studio for educators · v1.3.1**
+**AI-powered prompt studio for educators · v1.4.0**
 
 TeachPrompt is a production-quality, modular web application that helps educators compose precise, model-aware prompts for generating classroom-ready instructional graphics (infographics, flowcharts, timelines, concept maps, diagrams, comparison charts, process illustrations, and more).
 
@@ -42,6 +42,7 @@ Here is a breakdown of how the design system and CSS guarantee seamless display 
 - **Prompt History** — Automatic logging of copied or downloaded prompts (up to 30 entries) with one-click restoration.
 - **Installable PWA** — Offline caching via Service Worker (`service-worker.js`).
 - **Dark & Light Mode** — Persisted user theme preference with seamless CSS variables.
+- **English & Spanish** — The whole interface and the generated prompt switch between English and Spanish with the EN / ES button. The first visit follows the browser language; the choice is saved afterwards. Saved presets and history work in both languages.
 
 ---
 
@@ -56,21 +57,27 @@ teachprompt/
 │   └── styles.css          # Design system, themes, and media queries
 ├── js/
 │   ├── app.js              # Application bootstrapper & SW registration
-│   ├── config.js           # Single source of truth for options & state defaults
+│   ├── config.js           # Single source of truth for options & state defaults (bilingual labels)
+│   ├── i18n.js             # Language detection, EN/ES switch, and all fixed UI and prompt texts
 │   ├── prompt-builder.js   # Pure prompt generation & constraint composition
 │   ├── storage.js          # localStorage, history, and preset import/export
 │   └── ui.js               # Reactive UI rendering, events, & modals
 └── assets/
     ├── logo.png            # Main branding visual
-    ├── logo-mark.svg       # Vector icon mark
-    ├── logo-full.svg       # Vector logo with wordmark
     └── icons/              # Favicons and PWA homescreen icons
         ├── favicon-32.png
         ├── apple-touch-icon.png
         ├── icon-192.png
-        ├── icon-512.png
-        └── icon-maskable-512.png
+        └── icon-512.png
 ```
+
+---
+
+## 🌐 Adding or Editing Translations
+
+- Fixed interface and prompt texts live in `js/i18n.js`, in the `en` and `es` blocks. Both blocks use the same keys.
+- Option labels live in `js/config.js` as `{ en: '...', es: '...' }`. The `id` and `value` fields never change with the language.
+- To add a third language, add its code to `LANGUAGES` and a new block to `STRINGS` in `i18n.js`, then add the same key to every bilingual label in `config.js`.
 
 ---
 
