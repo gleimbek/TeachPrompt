@@ -110,7 +110,7 @@ export function renderApp() {
           <p class="preview-placeholder" id="preview-placeholder"></p>
         </div>
         <div class="preview-actions">
-		  <button type="button" class="btn btn-primary" id="btn-execute">Ejecutar Prompt</button>
+		  <button type="button" class="btn btn-primary" id="btn-execute">Run Prompt</button>
           <button type="button" class="btn btn-secondary" id="btn-copy">Copy</button>
           <button type="button" class="btn btn-secondary" id="btn-download">Download .txt</button>
           <button type="button" class="btn btn-secondary" id="btn-reset">Reset</button>
